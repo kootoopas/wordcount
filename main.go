@@ -1,13 +1,13 @@
 package main
 
 import (
-	"strings"
-	"net/url"
-	"net/http"
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"net/url"
 	"os"
+	"strings"
 )
 
 func Check(err error) {
@@ -41,12 +41,14 @@ func readRemoteFile(src string) string {
 	Check(err)
 	body, err := ioutil.ReadAll(req.Body)
 	Check(err)
+
 	return string(body)
 }
 
 func readFile(src string) string {
 	contents, err := ioutil.ReadFile(src)
 	Check(err)
+
 	return string(contents)
 }
 
@@ -58,7 +60,7 @@ func main() {
 		txt = readRemoteFile(src)
 	} else {
 		txt = readFile(src)
- 	}
+	}
 
 	fmt.Printf("%d %d %d %s", chars(txt), words(txt), lines(txt), src)
 }
