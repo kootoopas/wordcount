@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -12,8 +11,32 @@ import (
 
 func Check(err error) {
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
 	}
+}
+
+func isSrcRemote(src string) bool {
+	u, err := url.Parse(src)
+	Check(err)
+
+	return u.Scheme == "http" || u.Scheme == "https"
+}
+
+func readRemoteFile(src string) string {
+	resp, err := http.Get(src)
+	defer resp.Body.Close()
+	Check(err)
+	body, err := ioutil.ReadAll(resp.Body)
+	Check(err)
+
+	return string(body)
+}
+
+func readFile(src string) string {
+	contents, err := ioutil.ReadFile(src)
+	Check(err)
+
+	return string(contents)
 }
 
 func chars(txt string) int {
@@ -28,30 +51,6 @@ func lines(txt string) int {
 	return len(strings.Split(txt, "\n"))
 }
 
-func isSrcRemote(src string) bool {
-	u, err := url.Parse(src)
-	Check(err)
-
-	return u.Scheme == "http" || u.Scheme == "https"
-}
-
-func readRemoteFile(src string) string {
-	req, err := http.Get(src)
-	defer req.Body.Close()
-	Check(err)
-	body, err := ioutil.ReadAll(req.Body)
-	Check(err)
-
-	return string(body)
-}
-
-func readFile(src string) string {
-	contents, err := ioutil.ReadFile(src)
-	Check(err)
-
-	return string(contents)
-}
-
 func main() {
 	var txt string
 	src := os.Args[1]
@@ -62,5 +61,5 @@ func main() {
 		txt = readFile(src)
 	}
 
-	fmt.Printf("%d %d %d %s", chars(txt), words(txt), lines(txt), src)
+	fmt.Printf("%d %d %d %s", lines(txt), words(txt), chars(txt), src)
 }
